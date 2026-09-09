@@ -1,0 +1,12 @@
+# Environment / secrets
+.env
+config.php
+*.log
+
+# Dependencies
+vendor/
+node_modules/
+
+# OS junk
+.DS_Store
+Thumbs.db
