@@ -29,8 +29,8 @@ CREATE TABLE `Users` (
 
 -- Create Contacts Table
 CREATE TABLE `Contacts` (
-    `ID` INT NOT NULL AUTO_INCREMENT,,
-    'UserID' INT NOT NULL DEFAULT 0,
+    `ID` INT NOT NULL AUTO_INCREMENT,
+    `UserID` INT NOT NULL DEFAULT 0,
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
     `Phone` VARCHAR(20),
