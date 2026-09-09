@@ -29,11 +29,12 @@ CREATE TABLE `Users` (
 
 -- Create Contacts Table
 CREATE TABLE `Contacts` (
-    `ID` INT NOT NULL AUTO_INCREMENT,
+    `ID` INT NOT NULL AUTO_INCREMENT,,
+    'UserID' INT NOT NULL DEFAULT 0,
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
-    `phone` VARCHAR(20),
-    `email` VARCHAR(255),
+    `Phone` VARCHAR(20),
+    `Email` VARCHAR(255),
     PRIMARY KEY (`ID`),
     INDEX `idx_contacts_userid` (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -45,27 +46,27 @@ INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`) VALUES
 ('Ezra', 'Neri', 'EzraN', 'COP4331'),
 ('John', 'Aedo', 'JohnA', 'COP4331');
 
--- Seed Sample Colors for User 3 (EzraN)
+-- Seed Sample Contacts for User 3 (EzraN)
 INSERT INTO `Contacts` (`FirstName`,`LastName`, `UserID`) VALUES
-('Graham','Davis', 1),
-('Joshua','Sar-Shalom', 1),
-('Elier', 'Aguilar', 1),
-('Caleb','Kimondo' 1),
-('John','Aedo' 1);
+('Graham','Davis', 3),
+('Joshua','Sar-Shalom', 3),
+('Elier', 'Aguilar', 3),
+('Caleb','Kimondo', 3),
+('John','Aedo', 3);
 
--- Seed Sample Colors for User 4 (JohnA)
-INSERT INTO `Colors` (`FirstName`,`LastName`, `UserID`) VALUES
-('Graham','Davis', 1),
-('Joshua','Sar-Shalom', 1),
-('Elier', 'Aguilar', 1),
-('Caleb','Kimondo' 1),
-('Ezra','Neri' 1);
+-- Seed Sample Contacts for User 4 (JohnA)
+INSERT INTO `Contacts` (`FirstName`,`LastName`, `UserID`) VALUES
+('Graham','Davis', 4),
+('Joshua','Sar-Shalom', 4),
+('Elier', 'Aguilar', 4),
+('Caleb','Kimondo', 4),
+('Ezra','Neri', 4);
 
 -- Create Application Database User & Privileges
 CREATE USER IF NOT EXISTS 'ContactManagerUser'@'localhost' IDENTIFIED BY 'WeLoveCOP4331!';
 GRANT ALL PRIVILEGES ON `ContactManagerDB`.* TO 'ContactManagerUser'@'localhost';
 
-CREATE USER IF NOT EXISTS 'ColorsAppUser'@'%' IDENTIFIED BY 'WeLoveCOP4331!';
+CREATE USER IF NOT EXISTS 'ContactManagerUser'@'%' IDENTIFIED BY 'WeLoveCOP4331!';
 GRANT ALL PRIVILEGES ON `ContactManagerDB`.* TO 'ContactManagerUser'@'%';
 
 FLUSH PRIVILEGES;
