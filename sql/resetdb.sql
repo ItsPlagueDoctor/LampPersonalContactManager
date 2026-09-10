@@ -6,11 +6,11 @@
 -- ============================================================
 
 -- Create and select database
-CREATE DATABASE IF NOT EXISTS `ContactManagerDB`
+CREATE DATABASE IF NOT EXISTS `ContactsAppDB`
     DEFAULT CHARACTER SET utf8mb4
     DEFAULT COLLATE utf8mb4_unicode_ci;
 
-USE `ContactManagerDB`;
+USE `ContactsAppDB`;
 
 -- Drop existing tables to ensure a clean state
 DROP TABLE IF EXISTS `Contacts`;
@@ -23,6 +23,8 @@ CREATE TABLE `Users` (
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
     `Login` VARCHAR(50) NOT NULL DEFAULT '',
     `Password` VARCHAR(50) NOT NULL DEFAULT '',
+    `DateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `DateUpdated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
     INDEX `idx_users_login` (`Login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -35,8 +37,12 @@ CREATE TABLE `Contacts` (
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
     `Phone` VARCHAR(20),
     `Email` VARCHAR(255),
+    `DateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `DateUpdated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
-    INDEX `idx_contacts_userid` (`UserID`)
+    INDEX `idx_contacts_userid` (`UserID`),
+    CONSTRAINT `fk_contacts_user`
+        FOREIGN KEY (`UserID`) REFERENCES `Users`(`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Sample Users
@@ -64,9 +70,9 @@ INSERT INTO `Contacts` (`FirstName`,`LastName`, `UserID`) VALUES
 
 -- Create Application Database User & Privileges
 CREATE USER IF NOT EXISTS 'ContactManagerUser'@'localhost' IDENTIFIED BY 'WeLoveCOP4331!';
-GRANT ALL PRIVILEGES ON `ContactManagerDB`.* TO 'ContactManagerUser'@'localhost';
+GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactManagerUser'@'localhost';
 
 CREATE USER IF NOT EXISTS 'ContactManagerUser'@'%' IDENTIFIED BY 'WeLoveCOP4331!';
-GRANT ALL PRIVILEGES ON `ContactManagerDB`.* TO 'ContactManagerUser'@'%';
+GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactManagerUser'@'%';
 
 FLUSH PRIVILEGES;
