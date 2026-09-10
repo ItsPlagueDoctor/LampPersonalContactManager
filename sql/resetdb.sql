@@ -69,10 +69,10 @@ INSERT INTO `Contacts` (`FirstName`,`LastName`, `UserID`) VALUES
 ('Ezra','Neri', 4);
 
 -- Create Application Database User & Privileges
-CREATE USER IF NOT EXISTS 'ContactManagerUser'@'localhost' IDENTIFIED BY 'WeLoveCOP4331!';
-GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactManagerUser'@'localhost';
+CREATE USER IF NOT EXISTS 'ContactsAppUser'@'localhost' IDENTIFIED BY 'WeLoveCOP4331!';
+GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactsAppUser'@'localhost';
 
-CREATE USER IF NOT EXISTS 'ContactManagerUser'@'%' IDENTIFIED BY 'WeLoveCOP4331!';
-GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactManagerUser'@'%';
+CREATE USER IF NOT EXISTS 'ContactsAppUser'@'%' IDENTIFIED BY 'WeLoveCOP4331!';
+GRANT ALL PRIVILEGES ON `ContactsAppDB`.* TO 'ContactsAppUser'@'%';
 
 FLUSH PRIVILEGES;
