@@ -2,7 +2,7 @@
 -- SQL Full Reset Script: resetdb.sql
 -- Project: COP4331 LAMP Stack (Contact Manager)
 -- Description: Drops existing tables if present, recreates schema,
---              seeds users and colors, and sets up user permissions.
+--              seeds users and contacts, and sets up user permissions.
 -- ============================================================
 
 -- Create and select database
@@ -70,7 +70,7 @@ VALUES ('Admin'), ('User');
 -- passwords need to be hashed in future,
 -- contact api dev for this later.
 INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, RoleID) VALUES
-('Application','Administrator', 'root', 'COP4331', (SELECT ID FROM Roles WHERE RoleName = 'Admin'))
+('Application','Administrator', 'root', 'COP4331', (SELECT ID FROM Roles WHERE RoleName = 'Admin')),
 ('Rick', 'Leinecker', 'RickL', 'COP4331', (SELECT ID FROM Roles WHERE RoleName = 'User')),
 ('Sam', 'Hill', 'SamHAdmin', 'Test', (SELECT ID FROM Roles WHERE RoleName = 'Admin')),
 ('Ezra', 'Neri', 'EzraNAdmin', 'COP4331', (SELECT ID FROM Roles WHERE RoleName = 'Admin')),
