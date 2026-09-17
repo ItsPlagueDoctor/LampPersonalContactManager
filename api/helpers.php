@@ -116,4 +116,19 @@ function clean($data) {
     return $data;
 }
 
-// Add another helper function to check whether user is an admin or normal user
+// Get user role whether they are admin or user
+function getUserRole($db, $userId){
+    $stmt = $db->prepare("SELECT RoleID FROM Users WHERE ID = :id AND IsActive=1");
+    $stmt->execute([':id' => $userId]);
+    $user = $stmt->fetch();
+
+    return $user ? (int)$user['RoleID'] : null;
+}
+
+// Check if admin
+function requireAdmin($db, $userId){
+    $roleID = getUserRole($db, $userId);
+    if($roleID !== 1){
+        respond(403, ['error' => 'Admin access required.']);
+    }
+}

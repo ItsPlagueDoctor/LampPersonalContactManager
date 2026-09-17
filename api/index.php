@@ -32,15 +32,21 @@ if ($method === 'POST' && $action === 'login') {
             respond(400, ['error' => 'Login and password are required']);
         }
 
-        $stmt = $db->prepare('SELECT ID, firstName, lastName, password FROM Users WHERE Login = :login LIMIT 1');
+        $stmt = $db->prepare('SELECT ID, firstName, lastName, password, RoleID, IsActive FROM Users WHERE Login = :login LIMIT 1');
         $stmt->execute([':login' => $login]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Check if active
+            if((int)$user['IsActive'] !== 1){
+                respond(403, ['error' => 'Account is disabled']);
+            }
+
             respond(200, [
                 'id'        => (int) $user['ID'],
                 'firstName' => $user['firstName'],
                 'lastName'  => $user['lastName'],
+                'RoleId'    => (int)$user['RoleID'],
                 'token'     => (string) $user['ID'],
                 'error'     => ''
             ]);
@@ -74,13 +80,14 @@ if($method === 'POST' && $action === 'register'){
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Add new user fields into the database
-    $sql = "INSERT INTO Users(firstName, lastName, login, password) VALUES (:firstName, :lastName, :login, :password)";
+    $sql = "INSERT INTO Users(firstName, lastName, login, password, RoleID) VALUES (:firstName, :lastName, :login, :password, :RoleID)";
     $stmt = $db->prepare($sql);
     $stmt->execute([
         ':firstName' => $firstName,
         ':lastName' => $lastName,
         ':login' => $login,
         ':password' => $hashedPassword,
+        ':RoleID' => 2
     ]);
 
     // Get the ID since db is auto increment
