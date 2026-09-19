@@ -1,0 +1,32 @@
+info:
+  name: Update Contact
+  type: http
+  seq: 8
+
+http:
+  method: PUT
+  url: "{{UrlBase}}?id=11"
+  headers:
+    - name: Authorization
+      value: Bearer 9
+  params:
+    - name: id
+      value: "11"
+      type: query
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "Oracle",
+        "lastName": "Aedo",
+        "phone": "124232323",
+        "email": "johnaedo@oracle.com"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

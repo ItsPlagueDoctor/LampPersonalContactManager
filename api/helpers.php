@@ -116,6 +116,90 @@ function clean($data) {
     return $data;
 }
 
+/**
+ * Requires authentication and returns the authenticated User ID.
+ * Looks for user identification in headers, cookies, session, query parameters, or request body.
+ * If unauthenticated, sends a 401 Unauthorized response and exits.
+ *
+ * @return int User ID
+ */
+function requireAuth() {
+    $userId = null;
+
+    // 1. Check Authorization Header (Bearer token, raw ID, or JWT)
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] 
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] 
+        ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null);
+
+    if ($authHeader) {
+        $token = trim(preg_replace('/^Bearer\s+/i', '', $authHeader));
+        if (is_numeric($token) && (int)$token > 0) {
+            $userId = (int)$token;
+        } else {
+            // Check if JWT payload contains userId, user_id, or sub
+            $parts = explode('.', $token);
+            if (count($parts) === 3) {
+                $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+                if (is_array($payload)) {
+                    $userId = $payload['userId'] ?? $payload['user_id'] ?? $payload['id'] ?? $payload['sub'] ?? null;
+                }
+            }
+        }
+    }
+
+    // 2. Check X-User-Id or User-Id custom HTTP header
+    if (!$userId) {
+        $xUserId = $_SERVER['HTTP_X_USER_ID'] ?? $_SERVER['HTTP_USER_ID'] ?? null;
+        if ($xUserId && is_numeric($xUserId) && (int)$xUserId > 0) {
+            $userId = (int)$xUserId;
+        }
+    }
+
+    // 3. Check Cookie (userId or user_id)
+    if (!$userId && isset($_COOKIE['userId']) && is_numeric($_COOKIE['userId'])) {
+        $userId = (int)$_COOKIE['userId'];
+    } elseif (!$userId && isset($_COOKIE['user_id']) && is_numeric($_COOKIE['user_id'])) {
+        $userId = (int)$_COOKIE['user_id'];
+    }
+
+    // 4. Check Session
+    if (!$userId) {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            @session_start();
+        }
+        if (isset($_SESSION['userId']) && is_numeric($_SESSION['userId'])) {
+            $userId = (int)$_SESSION['userId'];
+        } elseif (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id'])) {
+            $userId = (int)$_SESSION['user_id'];
+        }
+    }
+
+    // 5. Check Query Parameters (?userId= or ?user_id= or ?uid=)
+    if (!$userId) {
+        $qUserId = $_GET['userId'] ?? $_GET['user_id'] ?? $_GET['uid'] ?? null;
+        if ($qUserId && is_numeric($qUserId) && (int)$qUserId > 0) {
+            $userId = (int)$qUserId;
+        }
+    }
+
+    // 6. Check Request Body (userId or user_id)
+    if (!$userId) {
+        $body = getRequestBody();
+        $bUserId = $body['userId'] ?? $body['user_id'] ?? $body['uid'] ?? null;
+        if ($bUserId && is_numeric($bUserId) && (int)$bUserId > 0) {
+            $userId = (int)$bUserId;
+        }
+    }
+
+    // If still no valid numeric user ID, deny access with 401 Unauthorized
+    if (!$userId || (int)$userId <= 0) {
+        respond(401, ['error' => 'Unauthorized']);
+    }
+
+    return (int)$userId;
+}
+
+
 // Get user role whether they are admin or user
 function getUserRole($db, $userId){
     $stmt = $db->prepare("SELECT RoleID FROM Users WHERE ID = :id AND IsActive=1");
@@ -130,5 +214,54 @@ function requireAdmin($db, $userId){
     $roleID = getUserRole($db, $userId);
     if($roleID !== 1){
         respond(403, ['error' => 'Admin access required.']);
+    }
+}
+
+// Create new user
+function createUser($db, $body, $roleId){
+    // Needed variables
+    $firstName = clean($body['firstName']);
+    $lastName = clean($body['lastName']);
+    $login = clean($body['login']);
+    $password = $body['password'];
+
+    // Check if all are there
+    if (!$firstName || !$lastName || !$login || !$password) {
+            respond(400, ['error' => 'First name, last name, login and password are all required']);
+    }
+
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Add new user fields into the database
+    $sql = "INSERT INTO Users(firstName, lastName, login, password, RoleID) VALUES (:firstName, :lastName, :login, :password, :RoleID)";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([
+        ':firstName' => $firstName,
+        ':lastName' => $lastName,
+        ':login' => $login,
+        ':password' => $hashedPassword,
+        ':RoleID' => $roleId
+    ]);
+
+    // Get the ID since db is auto increment
+    $userId = $db->lastInsertId();
+
+    // Status codes
+    if ($userId) {
+            respond(201, [
+                'id'        => (int) $userId,
+                'firstName' => $firstName,
+                'lastName'  => $lastName,
+                'token'     => (string) $userId,
+                'error'     => ''
+            ]);
+        } else {
+            respond(401, [
+                'id'        => 0,
+                'firstName' => '',
+                'lastName'  => '',
+                'error'     => 'No Records Found'
+            ]);
     }
 }

@@ -1,0 +1,32 @@
+info:
+  name: Create admin
+  type: http
+  seq: 12
+
+http:
+  method: POST
+  url: "{{UrlBase}}?action=createAdmin"
+  headers:
+    - name: Authorization
+      value: Bearer 1
+  params:
+    - name: action
+      value: createAdmin
+      type: query
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "no2",
+        "lastName": "Admin",
+        "login": "return",
+        "password": "return1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

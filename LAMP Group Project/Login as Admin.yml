@@ -1,0 +1,27 @@
+info:
+  name: Login as Admin
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{UrlBase}}?action=login"
+  params:
+    - name: action
+      value: login
+      type: query
+  body:
+    type: json
+    data: |-
+      {
+        "login": "return",
+        "password": "return1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

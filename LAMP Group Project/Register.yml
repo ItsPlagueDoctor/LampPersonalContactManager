@@ -1,0 +1,20 @@
+info:
+  name: Register
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{UrlBase}}?action=register"
+  params:
+    - name: action
+      value: register
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

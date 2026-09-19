@@ -1,0 +1,23 @@
+info:
+  name: Delete Contact
+  type: http
+  seq: 9
+
+http:
+  method: DELETE
+  url: "{{UrlBase}}?id=11"
+  headers:
+    - name: Authorization
+      value: Bearer 9
+  params:
+    - name: id
+      value: "11"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

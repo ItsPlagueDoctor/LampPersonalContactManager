@@ -1,0 +1,5 @@
+name: LAMP Group Project
+variables:
+  - name: UrlBase
+    value: http://localhost:8000/api/index.php
+    description: ""
