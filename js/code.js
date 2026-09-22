@@ -14,7 +14,6 @@
 const urlBase = (typeof window !== 'undefined' && window.location &&
   (window.location.hostname === 'localhost' ||
    window.location.hostname === '127.0.0.1' ||
-   window.location.origin.includes('johnaedo') ||
    window.location.origin.includes('plague.quest')))
   ? '/api/index.php'
   : 'https://plague.quest/api/index.php';
