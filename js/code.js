@@ -14,9 +14,10 @@
 const urlBase = (typeof window !== 'undefined' && window.location &&
   (window.location.hostname === 'localhost' ||
    window.location.hostname === '127.0.0.1' ||
-   window.location.origin.includes('johnaedo')))
+   window.location.origin.includes('johnaedo') ||
+   window.location.origin.includes('plague.quest')))
   ? '/api/index.php'
-  : 'https://lamp.johnaedo.com/api/index.php';
+  : 'https://plague.quest/api/index.php';
 
 let userId = 0;
 let firstName = "";
@@ -26,6 +27,16 @@ let roleId = 0; // 1 = Admin, 2 = User
 // ------------------------------------------------------------
 // Shared helpers
 // ------------------------------------------------------------
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 function authXHR(method, url) {
   let xhr = new XMLHttpRequest();
@@ -39,52 +50,37 @@ function saveCookie() {
   let minutes = 20;
   let date = new Date();
   date.setTime(date.getTime() + minutes * 60 * 1000);
-  document.cookie =
-    "firstName=" + encodeURIComponent(firstName) +
-    ",lastName=" + encodeURIComponent(lastName) +
-    ",userId=" + userId +
-    ",roleId=" + roleId +
-    ";expires=" + date.toGMTString() +
-    ";path=/";
+  let payload = encodeURIComponent(JSON.stringify({ firstName, lastName, userId, roleId }));
+  document.cookie = "session=" + payload + ";expires=" + date.toUTCString() + ";path=/";
 }
 
 function readCookie() {
   userId = -1;
   roleId = 0;
-  let data = document.cookie;
-  let splits = data.split(";");
-  for (let i = 0; i < splits.length; i++) {
-    let pair = splits[i].trim();
-    let tokens = pair.split(",");
-    for (let j = 0; j < tokens.length; j++) {
-      let keyVal = tokens[j].trim().split("=");
-      if (keyVal[0] === "firstName") {
-        firstName = decodeURIComponent(keyVal[1] || "");
-      } else if (keyVal[0] === "lastName") {
-        lastName = decodeURIComponent(keyVal[1] || "");
-      } else if (keyVal[0] === "userId") {
-        userId = parseInt(keyVal[1]);
-      } else if (keyVal[0] === "roleId") {
-        roleId = parseInt(keyVal[1]);
-      }
-    }
+  let match = document.cookie.split(";").map(s => s.trim()).find(s => s.startsWith("session="));
+  if (!match) return false;
+  try {
+    let data = JSON.parse(decodeURIComponent(match.split("=").slice(1).join("=")));
+    firstName = data.firstName || "";
+    lastName = data.lastName || "";
+    userId = parseInt(data.userId);
+    roleId = parseInt(data.roleId);
+  } catch (e) {
+    return false;
   }
   return !(userId < 0 || isNaN(userId));
 }
 
 function doLogout() {
   userId = 0; firstName = ""; lastName = ""; roleId = 0;
-  document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  document.cookie = "lastName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  document.cookie = "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  document.cookie = "roleId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
   window.location.href = "index.html";
 }
 
 function renderUserBar() {
   let el = document.getElementById("userName");
   if (el) {
-    el.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white">${firstName} ${lastName}</strong></span>`;
+    el.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white">${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong></span>`;
   }
 }
 
@@ -225,20 +221,20 @@ function doRegister() {
 
 function renderContactRow(c) {
   let details = [];
-  if (c.phone) details.push(`<i class="bi bi-telephone me-1"></i>${c.phone}`);
-  if (c.email) details.push(`<i class="bi bi-envelope me-1"></i>${c.email}`);
+  if (c.phone) details.push(`<i class="bi bi-telephone me-1"></i>${escapeHtml(c.phone)}`);
+  if (c.email) details.push(`<i class="bi bi-envelope me-1"></i>${escapeHtml(c.email)}`);
   let detailHtml = details.length
     ? `<div class="contact-detail">${details.join('&nbsp;&nbsp;')}</div>`
     : `<div class="contact-detail">No phone or email on file</div>`;
 
   return `<div class="contact-row d-flex align-items-center justify-content-between">
     <div>
-      <div class="contact-name">${c.firstName} ${c.lastName}</div>
+      <div class="contact-name">${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</div>
       ${detailHtml}
     </div>
     <div class="d-flex gap-2">
-      <button type="button" class="btn btn-outline-secondary btn-sm" onclick='openEditContact(${JSON.stringify(c)})' title="Edit"><i class="bi bi-pencil"></i></button>
-      <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteContact(${c.id});" title="Delete"><i class="bi bi-trash"></i></button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" data-contact='${escapeHtml(JSON.stringify(c))}' onclick="openEditContact(JSON.parse(this.dataset.contact))" title="Edit"><i class="bi bi-pencil"></i></button>
+      <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteContact(${Number(c.id)});" title="Delete"><i class="bi bi-trash"></i></button>
     </div>
   </div>`;
 }
@@ -365,15 +361,16 @@ function renderUserRow(u) {
     : `<span class="badge rounded-pill badge-status-disabled px-3 py-2">Disabled</span>`;
   let toggleLabel = u.isActive ? "Disable" : "Enable";
   let toggleClass = u.isActive ? "btn-outline-danger" : "btn-outline-success";
+  let fullName = `${u.firstName} ${u.lastName}`;
 
   return `<tr>
-    <td>${u.firstName} ${u.lastName}</td>
-    <td class="text-secondary-contrast">${u.login}</td>
+    <td>${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</td>
+    <td class="text-secondary-contrast">${escapeHtml(u.login)}</td>
     <td>${roleBadge}</td>
     <td>${statusBadge}</td>
     <td class="text-end">
-      <button type="button" class="btn btn-outline-secondary btn-sm me-1" onclick="openResetPassword(${u.id}, '${(u.firstName + ' ' + u.lastName).replace(/'/g, "\\'")}')">Reset Password</button>
-      <button type="button" class="btn ${toggleClass} btn-sm" onclick="toggleUserActive(${u.id}, ${u.isActive ? 'true' : 'false'});">${toggleLabel}</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm me-1" data-uid="${Number(u.id)}" data-label="${escapeHtml(fullName)}" onclick="openResetPassword(this.dataset.uid, this.dataset.label)">Reset Password</button>
+      <button type="button" class="btn ${toggleClass} btn-sm" onclick="toggleUserActive(${Number(u.id)}, ${u.isActive ? 'true' : 'false'});">${toggleLabel}</button>
     </td>
   </tr>`;
 }
