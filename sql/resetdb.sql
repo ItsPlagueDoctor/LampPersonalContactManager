@@ -68,7 +68,7 @@ VALUES ('Admin'), ('User');
 
 -- Seed Sample Users
 INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, RoleID) VALUES
-('Corey', 'Pittman', 'CoreyP', '$2y$12$HbF.pz64xftezcW3eE9P8e0aSrm9hsfIv0cD6YXVYGRWStePIceoS', (SELECT ID FROM Roles WHERE RoleName = 'User'));
+('Corey', 'Pittman', 'CoreyP', '$2y$12$HbF.pz64xftezcW3eE9P8e0aSrm9hsfIv0cD6YXVYGRWStePIceoS', (SELECT ID FROM Roles WHERE RoleName = 'User')),
 ('Application','Administrator', 'root', '$2y$12$1pVoZlAAuBo.OELvC4p6pO07FPTAYeBAZLZKIh7UyKffY.9yweABu', (SELECT ID FROM Roles WHERE RoleName = 'Admin')),
 ('Graham', 'Davis', 'GrahamD', '$2y$12$6kvKQwOYg2xoNVllnzCK2OYehYax6RfK5qLRophrQZzSTPDL0IBxK', (SELECT ID FROM Roles WHERE RoleName = 'User')),
 ('Ezra', 'Neri', 'EzraNAdmin', '$2y$12$o/.GD3Ce59rs2maG9Yn2G.bIRtl7LwcbasrJOCnNK.0JRnSE2ovpu', (SELECT ID FROM Roles WHERE RoleName = 'Admin')),
