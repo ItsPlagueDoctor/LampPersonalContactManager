@@ -5,6 +5,7 @@
 //  GET    /api/index.php?ping=1   — status ping health check
 //  POST   /api/index.php?action=login (login)  — authenticate user
 //  POST   /api/index.php?action=register (signup) — sign up/register
+//  DELETE /api/index.php?action=deactivate -- delete account
 
 // ========ALL (ADMIN AND USERS)=============
 //  GET    /api/index.php          — list all contacts for user
@@ -80,6 +81,43 @@ if($method === 'POST' && $action === 'register'){
     $body = getRequestBody();
 
     createUser($db, $body, 2);
+}
+
+// 4. Delete Account
+if($method=== ‘DELETE’ && $action === ‘deactivate’){
+	$body = getRequestBody();
+
+    $login      = clean($body['login']);
+    $password   = $body['password'];
+    if(!$login || !$password){
+        respond(400, ['error' => 'Login and Password are required']);
+    }
+
+
+    $sql = 'SELECT * FROM Users WHERE Login = :login LIMIT 1';
+    $stmt = $db->prepare($sql);
+    $stmt->execute([
+        ':login'    => $login,
+    ]);
+    
+    $user = $stmt->fetch();
+
+    if(!$user['ID']){
+        respond(401, ['error' => 'No user found']);
+    }
+
+    if($user && password_verify($password, $user['password'])){
+
+        $sql = 'DELETE FROM Users WHERE id = :id LIMIT 1';
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        respond(204);
+
+    }else{
+        respond(401, ['error' => 'No user found']);
+    }
 }
 
 // ==================================================
