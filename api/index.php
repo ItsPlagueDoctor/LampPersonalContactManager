@@ -124,7 +124,7 @@ if($method=== ‘DELETE’ && $action === ‘deactivate’){
 // 5. Change Name
 if($method === 'PUT' && $action === 'changeName'){
     $body = getRequestBody();
-    changeName($db, $body)
+    changeName($db, $body);
 }
 
 // ==================================================
