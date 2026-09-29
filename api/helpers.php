@@ -265,3 +265,53 @@ function createUser($db, $body, $roleId){
             ]);
     }
 }
+
+//Function for changing the first and last name of an account
+function changeName($db, $body){
+    $newFirstName = clean($body['firstName']);
+    $newLastName = clean($body['lastName']);
+    $login = clean($body['login']);
+    $password = $body['password'];
+
+    // Check if all are there
+    if (!$newFirstName || !$newLastName || !$login || !$password) {
+            respond(400, ['error' => 'First name, last name, login and password are all required']);
+    }
+
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    //Find the user with login 
+    $sql = 'SELECT * FROM Users WHERE Login = :login LIMIT 1';
+    $stmt = $db->prepare($sql);
+    $stmt->execute([
+        ':login'    => $login,
+    ]);
+
+    $user = $stmt->fetch();
+    //does user exist?
+    if(!$user['ID']){
+        respond(401, ['error' => 'No user found']);
+    }
+
+    //check password
+    if($user && password_verify($password, $user['password'])){
+
+        // Add new user fields into already existing row
+        $sql = "UPDATE Users SET firstName = :firstName, lastName = :lastName, login = :login, password = :password, RoleID = :RoleID WHERE ID = :id";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':firstName' => $newFirstName,
+            ':lastName' => $newLastName,
+            ':login' => user['login'],
+            ':password' => user['password'],
+            ':RoleID' => user['RoleId']
+        ]);
+        return(200);
+       
+    }else{
+        respond(401, ['error' => 'No user found']);
+    }
+
+    
+}
