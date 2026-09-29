@@ -24,6 +24,60 @@ let lastName = "";
 let roleId = 0; // 1 = Admin, 2 = User
 
 // ------------------------------------------------------------
+// Theme (dark / light) — persisted in localStorage
+// ------------------------------------------------------------
+
+const THEME_KEY = "theme";
+
+function getSavedTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+  } catch (e) {
+    return "dark";
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-bs-theme", theme);
+  let icon = document.getElementById("themeToggleIcon");
+  let btn = document.getElementById("themeToggle");
+  if (icon) icon.className = theme === "light" ? "bi bi-moon-stars-fill" : "bi bi-sun-fill";
+  if (btn) {
+    let label = theme === "light" ? "Switch to dark mode" : "Switch to light mode";
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+  }
+}
+
+function toggleTheme() {
+  let next = getSavedTheme() === "light" ? "dark" : "light";
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  applyTheme(next);
+}
+
+function initThemeToggle() {
+  if (!document.getElementById("themeToggle")) {
+    let btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "themeToggle";
+    btn.className = "btn btn-outline-secondary btn-sm";
+    btn.style.cssText = "position:fixed;top:12px;right:12px;z-index:2000;";
+    btn.innerHTML = '<i id="themeToggleIcon" class="bi bi-sun-fill"></i>';
+    btn.addEventListener("click", toggleTheme);
+    document.body.appendChild(btn);
+  }
+  applyTheme(getSavedTheme());
+}
+
+// Apply immediately (avoids a flash of the wrong theme), then add the button once the DOM is ready
+applyTheme(getSavedTheme());
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initThemeToggle);
+} else {
+  initThemeToggle();
+}
+
+// ------------------------------------------------------------
 // Shared helpers
 // ------------------------------------------------------------
 
@@ -79,7 +133,7 @@ function doLogout() {
 function renderUserBar() {
   let el = document.getElementById("userName");
   if (el) {
-    el.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white">${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong></span>`;
+    el.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-body-emphasis">${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong></span>`;
   }
 }
 
