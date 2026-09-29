@@ -85,7 +85,7 @@ if($method === 'POST' && $action === 'register'){
 }
 
 // 4. Delete Account
-if($method=== ‘DELETE’ && $action === ‘deactivate’){
+if($method=== 'DELETE' && $action === 'deactivate'){
 	$body = getRequestBody();
 
     $login      = clean($body['login']);
