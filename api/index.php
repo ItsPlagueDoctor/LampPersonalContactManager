@@ -6,6 +6,7 @@
 //  POST   /api/index.php?action=login (login)  — authenticate user
 //  POST   /api/index.php?action=register (signup) — sign up/register
 //  DELETE /api/index.php?action=deactivate -- delete account
+//  PUT	   /api/index.php?action=changeName -- change name of person of the account, (NOT THE LOGIN)
 
 // ========ALL (ADMIN AND USERS)=============
 //  GET    /api/index.php          — list all contacts for user
@@ -118,6 +119,12 @@ if($method=== ‘DELETE’ && $action === ‘deactivate’){
     }else{
         respond(401, ['error' => 'No user found']);
     }
+}
+
+// 5. Change Name
+if($method === 'PUT' && $action === 'changeName'){
+    $body = getRequestBody();
+    changeName($db, $body)
 }
 
 // ==================================================
