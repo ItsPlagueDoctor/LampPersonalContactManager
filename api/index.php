@@ -103,16 +103,12 @@ if($method=== 'DELETE' && $action === 'deactivate'){
     
     $user = $stmt->fetch();
 
-    if(!$user['ID']){
-        respond(401, ['error' => 'No user found']);
-    }
-
     if($user && password_verify($password, $user['password'])){
 
         $sql = 'DELETE FROM Users WHERE ID = :id LIMIT 1';
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':id' => $id
+            ':id' => $user['ID']
         ]);
         respond(204);
 
