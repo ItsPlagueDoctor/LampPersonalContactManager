@@ -303,9 +303,9 @@ function changeName($db, $body){
         $stmt->execute([
             ':firstName' => $newFirstName,
             ':lastName' => $newLastName,
-            ':login' => user['login'],
-            ':password' => user['password'],
-            ':RoleID' => user['RoleId']
+            ':login' => $user['login'],
+            ':password' => $user['password'],
+            ':RoleID' => $user['RoleId']
         ]);
         return(200);
        
