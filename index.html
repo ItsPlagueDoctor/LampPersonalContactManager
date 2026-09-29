@@ -45,8 +45,8 @@
 
                         <!-- Mode Switcher -->
                         <div class="auth-switcher d-flex mb-4" role="tablist">
-                            <button type="button" id="showLoginTab" class="auth-tab active" onclick="setAuthMode('login');">Sign In</button>
-                            <button type="button" id="showRegisterTab" class="auth-tab" onclick="setAuthMode('register');">Register</button>
+                            <button type="button" id="showLoginTab" class="auth-tab active" role="tab" aria-selected="true" aria-controls="loginForm" onclick="setAuthMode('login');">Sign In</button>
+                            <button type="button" id="showRegisterTab" class="auth-tab" role="tab" aria-selected="false" aria-controls="registerForm" onclick="setAuthMode('register');">Register</button>
                         </div>
 
                         <!-- Login Form -->
