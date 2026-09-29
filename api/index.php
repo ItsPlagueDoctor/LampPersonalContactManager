@@ -108,7 +108,7 @@ if($method=== ‘DELETE’ && $action === ‘deactivate’){
 
     if($user && password_verify($password, $user['password'])){
 
-        $sql = 'DELETE FROM Users WHERE id = :id LIMIT 1';
+        $sql = 'DELETE FROM Users WHERE ID = :id LIMIT 1';
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':id' => $id
