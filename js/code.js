@@ -320,7 +320,7 @@ function saveContactEdit() {
   };
   let resultEl = document.getElementById("editContactResult");
 
-  let xhr = authXHR("PUT", urlBase + "?action=editContact" + payload.id);
+  let xhr = authXHR("PUT", urlBase + "?id=" + payload.id);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   xhr.onreadystatechange = function () {
     if (this.readyState === 4) {
