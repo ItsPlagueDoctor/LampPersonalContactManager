@@ -81,11 +81,11 @@ if ($method === 'POST' && $action === 'login') {
 if($method === 'POST' && $action === 'register'){
     $body = getRequestBody();
 
-    createUser($db, $body, 2);
+    createUser($db, $body, 2); 
 }
 
 // 4. Delete Account
-if($method=== ‘DELETE’ && $action === ‘deactivate’){
+if($method=== 'DELETE' && $action === 'deactivate'){
 	$body = getRequestBody();
 
     $login      = clean($body['login']);
@@ -121,10 +121,10 @@ if($method=== ‘DELETE’ && $action === ‘deactivate’){
     }
 }
 
-// 5. Change Name
+// 5. Change Name  
 if($method === 'PUT' && $action === 'changeName'){
     $body = getRequestBody();
-    changeName($db, $body)
+    changeName($db, $body);
 }
 
 // ==================================================
