@@ -305,3 +305,69 @@ body {
     color: var(--color-error) !important;
     background: rgba(248, 113, 113, 0.12);
 }
+
+/* ============================================================
+   Light theme overrides
+   PASTE AT THE VERY BOTTOM of your existing stylesheet.
+   Activated by <html data-bs-theme="light"> (set by code.js).
+   Dark mode is untouched: everything here is scoped to light.
+   ============================================================ */
+
+:root[data-bs-theme="light"] {
+    --bg-dark: #eef2f7;
+    --bg-card: #ffffff;
+    --bg-section: #f1f5f9;
+    --bg-input: #ffffff;
+
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #475569;
+
+    --color-error: #b91c1c;
+    --color-success: #047857;
+    --color-info: #0369a1;
+}
+
+/* Ambient glow: keep it, just softer on a light page */
+[data-bs-theme="light"] .background-glow {
+    opacity: 0.6;
+}
+
+/* Cards */
+[data-bs-theme="light"] .glass-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18) !important;
+}
+
+[data-bs-theme="light"] .section-card {
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Inputs */
+[data-bs-theme="light"] .input-group-text {
+    background-color: var(--bg-section) !important;
+}
+
+/* Sign In / Register tabs */
+[data-bs-theme="light"] .auth-switcher {
+    border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-bs-theme="light"] .auth-tab:not(.active):hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+/* Contact rows */
+[data-bs-theme="light"] .contact-row {
+    border-color: rgba(15, 23, 42, 0.12);
+}
+
+/* Admin table + badges */
+[data-bs-theme="light"] .table-dark {
+    --bs-table-border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-bs-theme="light"] .badge-role-user {
+    border-color: rgba(15, 23, 42, 0.15);
+}
