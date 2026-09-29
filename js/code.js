@@ -320,7 +320,7 @@ function saveContactEdit() {
   };
   let resultEl = document.getElementById("editContactResult");
 
-  let xhr = authXHR("PUT", urlBase + "?action=editContact");
+  let xhr = authXHR("PUT", urlBase + "?action=editContact" + payload.id);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   xhr.onreadystatechange = function () {
     if (this.readyState === 4) {
@@ -352,7 +352,7 @@ function deleteContact(id) {
 // ------------------------------------------------------------
 
 function renderUserRow(u) {
-  let roleBadge = u.roleId === 1
+  let roleBadge = u.roleID === 1
     ? `<span class="badge rounded-pill badge-role-admin px-3 py-2">Admin</span>`
     : `<span class="badge rounded-pill badge-role-user px-3 py-2">User</span>`;
   let statusBadge = u.isActive
@@ -380,7 +380,7 @@ function searchUsers() {
   let bodyEl = document.getElementById("userTableBody");
   resultEl.innerHTML = "";
 
-  let url = urlBase + "?action=users" + (q ? ("&q=" + encodeURIComponent(q)) : "");
+  let url = urlBase + "?action=listUsers" + (q ? ("&q=" + encodeURIComponent(q)) : "");
   let xhr = authXHR("GET", url);
   xhr.onreadystatechange = function () {
     if (this.readyState === 4) {
@@ -404,16 +404,23 @@ function searchUsers() {
 }
 
 function toggleUserActive(targetUserId, currentlyActive) {
-  if (!confirm(`Are you sure you want to ${currentlyActive ? "disable" : "enable"} this user?`)) return;
+  if (Number(targetUserId) === Number(userId)) {
+    alert("You can't disable your own account.");
+    return;
+  }
+  if (!currentlyActive) {
+    alert("Re-enabling users isn't supported by the server yet.");
+    return;
+  }
+  if (!confirm("Are you sure you want to disable this user?")) return;
 
-  let xhr = authXHR("POST", urlBase + "?action=setUserActive");
-  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+  let xhr = authXHR("PUT", urlBase + "?action=disableUser&id=" + targetUserId);
   xhr.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
       searchUsers();
     }
   };
-  xhr.send(JSON.stringify({ userId: targetUserId, isActive: !currentlyActive }));
+  xhr.send();
 }
 
 function openResetPassword(targetUserId, label) {
@@ -435,7 +442,7 @@ function saveResetPassword() {
     return;
   }
 
-  let xhr = authXHR("POST", urlBase + "?action=resetPassword");
+  let xhr = authXHR("PUT", urlBase + "?action=changePassword&id=" + targetUserId);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   xhr.onreadystatechange = function () {
     if (this.readyState === 4) {
@@ -447,7 +454,7 @@ function saveResetPassword() {
       }
     }
   };
-  xhr.send(JSON.stringify({ userId: targetUserId, newPassword: newPassword }));
+  xhr.send(JSON.stringify({ password: newPassword }));
 }
 
 function createAdmin() {
@@ -467,7 +474,7 @@ function createAdmin() {
     return;
   }
 
-  let xhr = authXHR("POST", urlBase + "?action=adminCreateUser");
+  let xhr = authXHR("POST", urlBase + "?action=createAdmin");
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   xhr.onreadystatechange = function () {
     if (this.readyState === 4) {
