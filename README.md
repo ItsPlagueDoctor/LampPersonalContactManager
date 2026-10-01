@@ -11,8 +11,8 @@ This project was developed with assistance from generative AI tools:
 
 - **Tool**: Claude 5.5 Sonnet (Anthropic, claude.ai)
 - **Dates**: September 22 - 28, 2026
-- **Scope**: Front end
-- **Use**: Made most of the front end
+- **Scope**: Front end & Backend
+- **Use**: Making of the front end, Bug fixes and Technical guidance
 
 All AI-generated code was reviewed, tested, and modified to meet 
 assignment requirements. Final implementation reflects our understanding 
